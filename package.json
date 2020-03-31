@@ -1,6 +1,6 @@
 {
   "name": "electron-ssr",
-  "version": "0.3.0-alpha.3",
+  "version": "0.3.0-alpha.5",
   "description": "Cross platform ShadowsocksR GUI client built with electron",
   "author": {
     "name": "The Electron-SSR Authors",
@@ -24,6 +24,7 @@
     "fs-extra": "^8.1.0",
     "http-shutdown": "^1.2.2",
     "iview": "^3.5.4",
+    "jsqr": "^1.2.0",
     "mousetrap": "^1.6.3",
     "qr-image": "^3.2.0",
     "sudo-prompt": "^9.1.1",
@@ -43,7 +44,7 @@
     "chalk": "^3.0.0",
     "cli-progress": "^3.6.0",
     "devtron": "^1.4.0",
-    "electron": "^6.1.7",
+    "electron": "^6.1.9",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "request": "^2.88.2",

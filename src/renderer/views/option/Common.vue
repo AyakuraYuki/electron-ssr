@@ -1,6 +1,6 @@
 <template>
   <div class="options-container px-2 pb-2 scroll-y">
-    <i-form ref="form" class="mt-1" :model="form" :rules="rules" :label-width="120">
+    <i-form ref="form" class="mt-1" :model="form" :rules="rules">
       <i-form-item prop="ssrPath" :label="$t('UI_SETTING_SSR_PYTHON_DIR')">
         <i-input
           v-model="form.ssrPath"
@@ -10,19 +10,22 @@
         />
         <i-button type="primary" @click="selectPath">{{$t('UI_SETTING_SELECT_SSR_PYTHON_DIR')}}</i-button>
       </i-form-item>
-      <div class="flex">
-        <i-form-item class="flex-1" :label="$t('UI_SETTING_AUTO_START')">
+      <div class="flex flex-jc-between">
+        <i-form-item class="flex" :label="$t('UI_SETTING_AUTO_START')">
           <i-checkbox v-model="form.autoLaunch" @on-change="update('autoLaunch')" />
         </i-form-item>
-        <i-form-item class="flex-1" :label="$t('UI_SETTING_SHARE_LAN')">
+        <i-form-item class="flex"  :label="$t('UI_SETTING_HIDE_WINDOW')">
+          <i-checkbox v-model="form.hideWindow" @on-change="update('hideWindow')" />
+        </i-form-item>
+        <i-form-item class="flex"  :label="$t('UI_SETTING_SHARE_LAN')">
           <i-checkbox v-model="form.shareOverLan" @on-change="update('shareOverLan')" />
         </i-form-item>
-        <i-form-item class="flex-1" :label="$t('UI_SETTING_ENABLE_HTTP_PORT')">
+        <i-form-item class="flex" :label="$t('UI_SETTING_ENABLE_HTTP_PORT')">
           <i-checkbox v-model="form.httpProxyEnable" @on-change="update('httpProxyEnable')" />
         </i-form-item>
       </div>
-      <div class="flex">
-        <i-form-item class="flex-1" :label="$t('UI_SETTING_PAC_PORT')">
+      <div class="flex flex-jc-between">
+        <i-form-item class="flex" :label="$t('UI_SETTING_PAC_PORT')">
           <i-input-number
             v-model="form.pacPort"
             :min="0"
@@ -30,7 +33,7 @@
             @on-change="update('pacPort')"
           />
         </i-form-item>
-        <i-form-item class="flex-1" :label="$t('UI_SETTING_LOCAL_LISTEN_PORT')">
+        <i-form-item class="flex" :label="$t('UI_SETTING_LOCAL_LISTEN_PORT')">
           <i-input-number
             v-model="form.localPort"
             :min="0"
@@ -38,7 +41,7 @@
             @on-change="update('localPort')"
           />
         </i-form-item>
-        <i-form-item class="flex-1" :label="$t('UI_SETTING_HTTP_PORT')">
+        <i-form-item class="flex" :label="$t('UI_SETTING_HTTP_PORT')">
           <i-input-number
             v-model="form.httpProxyPort"
             :min="0"
@@ -46,19 +49,22 @@
             @on-change="update('httpProxyPort')"
           />
         </i-form-item>
+        <i-form-item class="flex" :label="$t('UI_SETTING_PREFER_HTTP')">
+          <i-checkbox v-model="form.preferHTTPGlobal" @on-change="update('preferHTTPGlobal')" />
+        </i-form-item>
       </div>
-      <i-form-item prop="lang" label="Language" :label-width="120">
-          <i-select v-model="form.lang" class="language-selector-view" @input="update('lang')">
-            <i-option value="zh-CN">简体中文</i-option>
-            <i-option value="en-US">English</i-option>
-          </i-select>
+      <i-form-item prop="lang" label="Language">
+        <i-select v-model="form.lang" class="language-selector-view" @input="update('lang')">
+          <i-option value="zh-CN">简体中文</i-option>
+          <i-option value="en-US">English</i-option>
+        </i-select>
       </i-form-item>
     </i-form>
   </div>
 </template>
 <script>
 import { mapActions } from 'vuex'
-import { isSSRPathAvaliable, debounce } from '../../../shared/utils'
+import { isSSRPathAvaliable, debounce } from '@/shared/utils'
 import { openDialog } from '@/renderer/ipc'
 import i18n from '@/renderer/i18n'
 export default {
@@ -68,12 +74,14 @@ export default {
       form: {
         ssrPath: appConfig.ssrPath,
         autoLaunch: appConfig.autoLaunch,
+        hideWindow: appConfig.hideWindow,
         shareOverLan: appConfig.shareOverLan,
         localPort: appConfig.localPort,
         pacPort: appConfig.pacPort,
         httpProxyEnable: appConfig.httpProxyEnable,
         httpProxyPort: appConfig.httpProxyPort,
-        lang: appConfig.lang
+        lang: appConfig.lang,
+        preferHTTPGlobal: appConfig.preferHTTPGlobal === 1
       },
       rules: {
         ssrPath: [
@@ -83,7 +91,9 @@ export default {
                 if (exists) {
                   return Promise.resolve()
                 }
-                return Promise.reject(new Error(this.$t('UI_INCORRECT_FOLDER')))
+                return Promise.reject(
+                  new Error(this.$t('UI_INCORRECT_FOLDER'))
+                )
               })
             }
           }
@@ -132,6 +142,10 @@ export default {
       }
     },
     update: debounce(function (field) {
+      if (field === 'preferHTTPGlobal') {
+        this.updateConfig({ [field]: this.form[field] ? 1 : 0 })
+        return
+      }
       if (this.form[field] !== this.$store.state.appConfig[field]) {
         this.updateConfig({ [field]: this.form[field] })
         if (field === 'lang') {
@@ -143,7 +157,7 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-.language-selector-view{
-  width 180px;
+.language-selector-view {
+  width: 180px;
 }
 </style>
